@@ -1,0 +1,60 @@
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: #f7f7f5;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+  display: flex;
+  gap: 10px;
+}
+
+header button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  gap: 10px;
+  margin: 20px;
+}
+
+.notes-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 200px;
+  line-height: 1.6;
+}
+
+.key-terms {
+  background: #e8f4ff;
+}
+
+.summary {
+  background: #fff4e6;
+  grid-column: 1 / -1;
+}
+
+.actions {
+  margin: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  background: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}

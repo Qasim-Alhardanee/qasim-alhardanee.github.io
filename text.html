@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cornell Notes</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f7f7f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      overflow-x: auto;
+    }
+    header button, header input[type="color"], header select {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    header button:hover, header select:hover {
+      background: #eee;
+    }
+    header button svg { width: 20px; height: 20px; }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2.5fr;
+      gap: 10px;
+      margin: 20px;
+    }
+    .notes-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 200px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    .notes-box:focus { outline: 2px solid #4cafef; }
+    .key-terms { background: #e8f4ff; }
+    .main-notes { background: #fff; }
+    .summary { background: #fff4e6; grid-column: 1 / -1; }
+    h2 { margin-top: 0; font-size: 18px; color: #555; }
+    .actions {
+      margin: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .actions button {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .actions button:hover { background: #45a049; }
+    @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <!-- Toolbar -->
+  <header>
+    <button onclick="format('bold')"><i data-lucide="bold"></i></button>
+    <button onclick="format('italic')"><i data-lucide="italic"></i></button>
+    <button onclick="format('underline')"><i data-lucide="underline"></i></button>
+    <select onchange="format('formatBlock', this.value)">
+      <option value="p">Normal</option>
+      <option value="h1">H1</option>
+      <option value="h2">H2</option>
+      <option value="h3">H3</option>
+    </select>
+    <button onclick="format('insertUnorderedList')"><i data-lucide="list"></i></button>
+    <button onclick="format('insertOrderedList')"><i data-lucide="list-ordered"></i></button>
+    <button onclick="format('justifyLeft')"><i data-lucide="align-left"></i></button>
+    <button onclick="format('justifyCenter')"><i data-lucide="align-center"></i></button>
+    <button onclick="format('justifyRight')"><i data-lucide="align-right"></i></button>
+    <input type="color" onchange="format('foreColor', this.value)">
+    <input type="color" onchange="format('hiliteColor', this.value)">
+  </header>
+
+  <!-- Cornell Layout -->
+  <div class="container" id="notes-area">
+    <div class="notes-box key-terms" contenteditable="true">
+      <h2>Key Terms</h2>
+    </div>
+    <div class="notes-box main-notes" contenteditable="true">
+      <h2>Main Notes</h2>
+    </div>
+    <div class="notes-box summary" contenteditable="true">
+      <h2>Summary</h2>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button onclick="downloadTXT()">Download TXT</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    let activeBox = null;
+    document.querySelectorAll('.notes-box').forEach(box => {
+      box.addEventListener('click', () => { activeBox = box; });
+    });
+
+    function format(cmd, value = null) {
+      if (activeBox) {
+        document.execCommand(cmd, false, value);
+        activeBox.focus();
+      } else {
+        alert("Please click a note box first.");
+      }
+    }
+
+    function downloadTXT() {
+      const text = Array.from(document.querySelectorAll('.notes-box'))
+        .map(box => box.innerText)
+        .join("\n\n");
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "notes.txt";
+      a.click();
+    }
+
+    // PDF with Unicode font + auto page break
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+      // NotoSans Base64 font gömme (örnek, buraya gerçek Base64 gömülecek!)
+      doc.addFileToVFS("NotoSans.ttf", NOTO_SANS_BASE64);
+      doc.addFont("NotoSans.ttf", "NotoSans", "normal");
+      doc.setFont("NotoSans");
+
+      const keyTerms = document.querySelector(".key-terms").innerText.replace("Key Terms", "").trim();
+      const mainNotes = document.querySelector(".main-notes").innerText.replace("Main Notes", "").trim();
+      const summary = document.querySelector(".summary").innerText.replace("Summary", "").trim();
+
+      let y = 60;
+      y = addSection(doc, "Key Terms:", keyTerms, y);
+      y = addSection(doc, "Main Notes:", mainNotes, y);
+      addSection(doc, "Summary:", summary, y);
+
+      doc.save("notes.pdf");
+    }
+
+    function addSection(doc, title, text, startY) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 40;
+      const lineHeight = 18;
+      const maxWidth = pageWidth - margin * 2;
+
+      let y = startY;
+      doc.setFontSize(14);
+      doc.text(title, margin, y);
+      y += 25;
+
+      doc.setFontSize(12);
+      const lines = doc.splitTextToSize(text, maxWidth);
+
+      lines.forEach(line => {
+        if (y + lineHeight > pageHeight - margin) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+
+      return y + 20; // next section spacing
+    }
+
+    // TODO: buraya gerçek NotoSans Base64 string gelecek
+    const NOTO_SANS_BASE64 = "BASE64_STRING_HERE";
+  </script>
+</body>
+</html>
