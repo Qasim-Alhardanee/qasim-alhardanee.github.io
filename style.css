@@ -3,6 +3,14 @@ body {
   background: #f7f7f5;
   margin: 0;
   padding: 0;
+  color: #333;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Dark theme */
+body.dark {
+  background: #1e1e1e;
+  color: #eee;
 }
 
 header {
@@ -11,12 +19,46 @@ header {
   padding: 8px 12px;
   display: flex;
   gap: 10px;
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-header button {
+body.dark header {
+  background: #2c2c2c;
+  border-color: #444;
+}
+
+header button, header select, header input[type="color"] {
   border: none;
   background: none;
   cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+header button:hover, header select:hover {
+  background: #eee;
+}
+
+body.dark header button:hover, 
+body.dark header select:hover {
+  background: #444;
+}
+
+header button.active {
+  background: #ccc;
+}
+
+body.dark header button.active {
+  background: #666;
+}
+
+header button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .container {
@@ -33,12 +75,16 @@ header button {
   padding: 10px;
   min-height: 200px;
   line-height: 1.6;
+  overflow-wrap: break-word;
 }
 
-.key-terms {
-  background: #e8f4ff;
+body.dark .notes-box {
+  background: #2c2c2c;
+  border-color: #444;
+  color: #eee;
 }
 
+.key-terms { background: #e8f4ff; }
 .summary {
   background: #fff4e6;
   grid-column: 1 / -1;
@@ -57,4 +103,15 @@ header button {
   padding: 10px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.actions button:hover {
+  background: #45a049;
+}
+
+@media(max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
 }

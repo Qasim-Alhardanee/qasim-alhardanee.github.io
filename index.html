@@ -13,9 +13,23 @@
 <body>
   <!-- Toolbar -->
   <header>
-    <button onclick="format('bold')"><i data-lucide="bold"></i></button>
-    <button onclick="format('italic')"><i data-lucide="italic"></i></button>
-    <button onclick="format('underline')"><i data-lucide="underline"></i></button>
+    <button data-cmd="bold"><i data-lucide="bold"></i></button>
+    <button data-cmd="italic"><i data-lucide="italic"></i></button>
+    <button data-cmd="underline"><i data-lucide="underline"></i></button>
+    <select data-cmd="formatBlock">
+      <option value="p">Normal</option>
+      <option value="h1">H1</option>
+      <option value="h2">H2</option>
+      <option value="h3">H3</option>
+    </select>
+    <button data-cmd="insertUnorderedList"><i data-lucide="list"></i></button>
+    <button data-cmd="insertOrderedList"><i data-lucide="list-ordered"></i></button>
+    <button data-cmd="justifyLeft"><i data-lucide="align-left"></i></button>
+    <button data-cmd="justifyCenter"><i data-lucide="align-center"></i></button>
+    <button data-cmd="justifyRight"><i data-lucide="align-right"></i></button>
+    <input type="color" data-cmd="foreColor">
+    <input type="color" data-cmd="hiliteColor">
+    <button id="theme-toggle"><i data-lucide="moon"></i></button>
   </header>
 
   <!-- Cornell Layout -->
@@ -29,7 +43,7 @@
   <div class="actions">
     <button onclick="downloadPDF()">Download PDF</button>
   </div>
-
+  <script src="noto-sans.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
